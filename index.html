@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Track your savings toward your dream PC build" />
+  <title>PC Build Savings Tracker</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+
+  <!-- App Styles -->
+  <link rel="stylesheet" href="public/css/base.css" />
+  <link rel="stylesheet" href="public/css/components.css" />
+  <link rel="stylesheet" href="public/css/layout.css" />
+  <link rel="stylesheet" href="public/css/animations.css" />
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0a0a0f" />
+</head>
+<body>
+
+  <!-- Toast notifications -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Add / Edit Entry Modal -->
+  <div class="modal-overlay" id="addModal">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title" id="modalTitle">Add Entry</span>
+        <button class="btn-icon" onclick="App.closeModal()"><i class="ti ti-x"></i></button>
+      </div>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <!-- Goal Modal -->
+  <div class="modal-overlay" id="goalModal">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title">Set PC Build Goal</span>
+        <button class="btn-icon" onclick="App.closeGoalModal()"><i class="ti ti-x"></i></button>
+      </div>
+      <div id="goalModalBody"></div>
+    </div>
+  </div>
+
+  <!-- Mobile sidebar backdrop -->
+  <div class="sidebar-backdrop" id="backdrop" onclick="App.closeSidebar()"></div>
+
+  <!-- App Shell -->
+  <div class="app" id="app">
+
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-icon">
+          <i class="ti ti-cpu" aria-hidden="true"></i>
+        </div>
+        <div>
+          <div class="logo-text">PC Savings</div>
+          <div class="logo-sub">Build Tracker</div>
+        </div>
+      </div>
+
+      <div class="nav" role="navigation" aria-label="Main navigation">
+        <div class="nav-label">MAIN</div>
+        <a class="nav-item active" data-page="dashboard" onclick="App.navigate('dashboard', this)">
+          <i class="ti ti-layout-dashboard" aria-hidden="true"></i>Dashboard
+        </a>
+        <a class="nav-item" data-page="add" onclick="App.navigate('add', this)">
+          <i class="ti ti-circle-plus" aria-hidden="true"></i>Add Entry
+        </a>
+        <a class="nav-item" data-page="history" onclick="App.navigate('history', this)">
+          <i class="ti ti-history" aria-hidden="true"></i>History
+        </a>
+
+        <div class="nav-label">TOOLS</div>
+        <a class="nav-item" data-page="goals" onclick="App.navigate('goals', this)">
+          <i class="ti ti-target" aria-hidden="true"></i>Goals
+        </a>
+        <a class="nav-item" data-page="import" onclick="App.navigate('import', this)">
+          <i class="ti ti-upload" aria-hidden="true"></i>Import
+        </a>
+        <a class="nav-item" data-page="export" onclick="App.navigate('export', this)">
+          <i class="ti ti-download" aria-hidden="true"></i>Export
+        </a>
+
+        <div class="nav-label">INSIGHTS</div>
+        <a class="nav-item" data-page="analytics" onclick="App.navigate('analytics', this)">
+          <i class="ti ti-chart-bar" aria-hidden="true"></i>Analytics
+        </a>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-footer-text">v1.0.0 &middot; Local Storage</div>
+      </div>
+    </nav>
+
+    <!-- Main content -->
+    <div class="main">
+
+      <!-- Top bar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="hamburger" onclick="App.toggleSidebar()" aria-label="Toggle menu">
+            <i class="ti ti-menu-2"></i>
+          </button>
+          <span class="topbar-title" id="topbarTitle">Dashboard</span>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn btn-primary" onclick="App.navigate('add', null)">
+            <i class="ti ti-plus" aria-hidden="true"></i>Add Entry
+          </button>
+        </div>
+      </header>
+
+      <!-- Pages -->
+      <main id="pageContainer">
+
+        <section class="page active" id="page-dashboard" aria-label="Dashboard"></section>
+        <section class="page" id="page-add" aria-label="Add Entry"></section>
+        <section class="page" id="page-history" aria-label="Savings History"></section>
+        <section class="page" id="page-goals" aria-label="Goal Tracking"></section>
+        <section class="page" id="page-import" aria-label="Import Records"></section>
+        <section class="page" id="page-export" aria-label="Export Data"></section>
+        <section class="page" id="page-analytics" aria-label="Analytics"></section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- External libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+  <!-- App modules (order matters) -->
+  <script src="src/utils/db.js"></script>
+  <script src="src/utils/helpers.js"></script>
+  <script src="src/utils/constants.js"></script>
+  <script src="src/components/toast.js"></script>
+  <script src="src/components/charts.js"></script>
+  <script src="src/components/modals.js"></script>
+  <script src="src/components/dashboard.js"></script>
+  <script src="src/components/addEntry.js"></script>
+  <script src="src/components/history.js"></script>
+  <script src="src/components/goals.js"></script>
+  <script src="src/components/importData.js"></script>
+  <script src="src/components/exportData.js"></script>
+  <script src="src/components/analytics.js"></script>
+  <script src="src/app.js"></script>
+
+</body>
+</html>
